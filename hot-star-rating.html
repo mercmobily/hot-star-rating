@@ -142,16 +142,12 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
         this._stars = a;
       },
 
-      _o: function( o ){
-        return JSON.stringify( o );
-      },
       _updateValue: function( e ) {
         var id = parseInt( e.currentTarget.id );
         this.value = id + 1;
       },
 
       _updateStars: function( value, maxStars ) {
-        debugger;
         var intPart = Math.floor( value );
         var decimalPart = value % 1;
         for( var i = 0; i < maxStars; i++ ) {

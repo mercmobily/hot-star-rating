@@ -4,9 +4,8 @@
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 
-
 <!--
-Form element that allow users to enter 5 5 star rating using paper-icon-button and iron-icon.
+Form element that allow users to enter 5 star rating using paper-icon-button and iron-icon.
 
 ### Usage
 
@@ -14,11 +13,16 @@ Rate can be set by setting the element's value.
 
     <star-rating value="2.3"></star-rating>
 
+You can chose how many starts the element starts with:
+
+    <star-rating max-stars="10" value="2.3"></star-rating>
+
 The element can be used in a form:
 
     <form is="iron-form" action="/same/action">
       <star-rating name="rating" value="2.3"></star-rating>
     </form>
+
 
 If read-only is set, voting won't be allowed and the "votes" span will be displayed:
 
@@ -37,6 +41,10 @@ If read-only is set, voting won't be allowed and the "votes" span will be displa
 `--hot-star-rating-iron-icon` | Mixin applied to the iron-icon in the element | `{}`
 `--hot-star-rating-iron-icon-button` | Mixin applied to the iron-icon-button in the element | `{}`
 `--hot-star-rating-color` | Color set for stars | `#4775D1`
+
+### Note
+
+Core originally based from https://github.com/acordeonl/star-rating and https://github.com/covas/star-rating. However, please note that the only thing in common with the original code at this point is the name of three variables.
 
 @demo demo/hot-star-rating-demo.html
 -->
@@ -89,7 +97,7 @@ If read-only is set, voting won't be allowed and the "votes" span will be displa
       is: "hot-star-rating",
 
       observers: [
-          '_updateStars(value)'
+          '_updateStars(value,maxStars)'
       ],
 
       behaviors: [
@@ -100,7 +108,9 @@ If read-only is set, voting won't be allowed and the "votes" span will be displa
 
         _stars: {
           type: Array,
-          value: function(){ return [ { value: "star-border" }, { value: "star-border" }, { value: "star-border" }, { value: "star-border" }, { value: "star-border" } ]; },
+          value: function(){
+            return [];
+          },
         },
 
         value: {
@@ -114,17 +124,37 @@ If read-only is set, voting won't be allowed and the "votes" span will be displa
         readOnly: {
           type: Boolean,
           value: false
-        }
+        },
+
+        /**
+        * The maximum number of stars.
+        */
+        maxStars: {
+          type: Number,
+          value: 5
+        },
+
+      },
+
+      attached: function(){
+        var a = [];
+        for( var i = 0; i < this.maxStars; i++ ) a.push( { value: "star-border" } );
+        this._stars = a;
+      },
+
+      _o: function( o ){
+        return JSON.stringify( o );
       },
       _updateValue: function( e ) {
         var id = parseInt( e.currentTarget.id );
         this.value = id + 1;
       },
 
-      _updateStars: function( value ) {
+      _updateStars: function( value, maxStars ) {
+        debugger;
         var intPart = Math.floor( value );
         var decimalPart = value % 1;
-        for( var i = 0; i < 5; i++ ) {
+        for( var i = 0; i < maxStars; i++ ) {
             this.set( '_stars.' +  i + '.value',  (i < intPart) ?  'star' : 'star-border' ) ;
         }
         if( decimalPart >= 0.5 ) this.set( '_stars.' +  intPart + '.value', "star-half" );

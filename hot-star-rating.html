@@ -1,0 +1,135 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+
+
+<!--
+Form element that allow users to enter 5 5 star rating using paper-icon-button and iron-icon.
+
+### Usage
+
+Rate can be set by setting the element's value.
+
+    <star-rating value="2.3"></star-rating>
+
+The element can be used in a form:
+
+    <form is="iron-form" action="/same/action">
+      <star-rating name="rating" value="2.3"></star-rating>
+    </form>
+
+If read-only is set, voting won't be allowed and the "votes" span will be displayed:
+
+    <star-rating value="2" read-only>
+        <span slot="votes">
+            &nbsp (12
+            votes)
+        </span>
+    </star-rating>
+
+### Styling
+
+ Custom property | Description | Default
+----------------|-------------|----------
+`--hot-star-rating` | Mixin applied to the whole element | `{}`
+`--hot-star-rating-iron-icon` | Mixin applied to the iron-icon in the element | `{}`
+`--hot-star-rating-iron-icon-button` | Mixin applied to the iron-icon-button in the element | `{}`
+`--hot-star-rating-color` | Color set for stars | `#4775D1`
+
+@demo demo/hot-star-rating-demo.html
+-->
+
+<dom-module id="hot-star-rating">
+  <template>
+
+    <style>
+      :host {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+
+        @apply(--hot-star-rating);
+      }
+      iron-icon {
+        color: var(--hot-star-rating-color, #4775D1);
+        @apply(--hot-star-rating-iron-icon);
+      }
+      paper-icon-button {
+        color: var(--hot-star-rating-color, #4775D1);
+        @apply(--hot-star-rating-iron-icon-button);
+      }
+    </style>
+
+    <div>
+      <template id="domRepeat" is="dom-repeat" items="{{_stars}}" as="star">
+
+        <!-- The read-only version of the element -->
+        <template is="dom-if" if="[[readOnly]]">
+          <iron-icon icon="{{star.value}}"></iron-icon>
+        </template>
+
+        <!-- The wrote version of the element -->
+        <template is="dom-if" if="[[!readOnly]]">
+          <paper-icon-button id="{{index}}" on-click="_updateValue" icon="{{star.value}}"></paper-icon-button>
+        </template>
+
+      </template>
+
+      <!-- The slot to show extra text-->
+      <template is="dom-if" if="[[readOnly]]">
+        <slot name="votes"></slot>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: "hot-star-rating",
+
+      observers: [
+          '_updateStars(value)'
+      ],
+
+      behaviors: [
+        Polymer.IronFormElementBehavior
+      ],
+
+      properties: {
+
+        _stars: {
+          type: Array,
+          value: function(){ return [ { value: "star-border" }, { value: "star-border" }, { value: "star-border" }, { value: "star-border" }, { value: "star-border" } ]; },
+        },
+
+        value: {
+          type: Number,
+          value: 0
+        },
+
+        /**
+        * If true, the element is read-only and voting will not be allowed
+        */
+        readOnly: {
+          type: Boolean,
+          value: false
+        }
+      },
+      _updateValue: function( e ) {
+        var id = parseInt( e.currentTarget.id );
+        this.value = id + 1;
+      },
+
+      _updateStars: function( value ) {
+        var intPart = Math.floor( value );
+        var decimalPart = value % 1;
+        for( var i = 0; i < 5; i++ ) {
+            this.set( '_stars.' +  i + '.value',  (i < intPart) ?  'star' : 'star-border' ) ;
+        }
+        if( decimalPart >= 0.5 ) this.set( '_stars.' +  intPart + '.value', "star-half" );
+      },
+
+    });
+  </script>
+</dom-module>

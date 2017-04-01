@@ -84,6 +84,9 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
 
       </template>
 
+      <template is="dom-if" if="[[votes]]">
+        ([[votes]])
+      </template>
       <!-- The slot to show extra text-->
       <template is="dom-if" if="[[readOnly]]">
         <slot name="votes"></slot>
@@ -118,6 +121,11 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
           value: 0
         },
 
+        votes: {
+          type: Number,
+          value: 0
+        },
+
         /**
         * If true, the element is read-only and voting will not be allowed
         */
@@ -140,6 +148,7 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
         var a = [];
         for( var i = 0; i < this.maxStars; i++ ) a.push( { value: "star-border" } );
         this._stars = a;
+        this._updateStars( this.value, this.maxStars );
       },
 
       _updateValue: function( e ) {

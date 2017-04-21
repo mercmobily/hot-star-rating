@@ -51,56 +51,75 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
 
 <dom-module id="hot-star-rating">
   <template>
-
     <style>
       :host {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
+        --hot-star-rating-icon-size: 24px;
+        --hot-star-rating-icon-color: #feb909;
 
+        display: inline-block;
+        -webkit-user-select: none; /* Chrome all / Safari all */
+        -moz-user-select: none;    /* Firefox all */
+        -ms-user-select: none;     /* IE 10+ */
+        user-select: none;         /* Likely future */
+        white-space: nowrap;
+        @apply(--layout-inline);
+        @apply(--layout-center);
         @apply(--hot-star-rating);
       }
       iron-icon {
-        color: var(--hot-star-rating-color, #4775D1);
-        @apply(--hot-star-rating-iron-icon);
+        width: var(--hot-star-rating-icon-size);
+        height: var(--hot-star-rating-icon-size);
+        color: var(--hot-star-rating-icon-color);
+        @apply(--hot-star-rating-icon);
       }
       paper-icon-button {
-        color: var(--hot-star-rating-color, #4775D1);
-        @apply(--hot-star-rating-iron-icon-button);
+        padding: 0;
+        width: var(--hot-star-rating-icon-size);
+        height: var(--hot-star-rating-icon-size);
+        color: var(--hot-star-rating-icon-color);
+        @apply(--hot-star-rating-icon-button);
+      }
+      iron-icon + iron-icon,
+      paper-icon-button + paper-icon-button {
+        margin-left: -4px; /* Compensate white space */
+      }
+      .text {
+        vertical-align: middle;
       }
     </style>
 
     <div>
-      <template id="domRepeat" is="dom-repeat" items="{{_stars}}" as="star">
-
-        <!-- The read-only version of the element -->
-        <template is="dom-if" if="[[readOnly]]">
+      <!-- The read-only version of the element -->
+      <template is="dom-if" if="[[readOnly]]">
+        <template id="domRepeat" is="dom-repeat" items="{{_stars}}" as="star">
           <iron-icon icon="{{star.value}}"></iron-icon>
         </template>
+      </template>
 
-        <!-- The wrote version of the element -->
-        <template is="dom-if" if="[[!readOnly]]">
+      <!-- The write version of the element -->
+      <template is="dom-if" if="[[!readOnly]]">
+        <template id="domRepeat" is="dom-repeat" items="{{_stars}}" as="star">
           <paper-icon-button id="{{index}}" on-click="_updateValue" icon="{{star.value}}"></paper-icon-button>
         </template>
-
       </template>
 
       <template is="dom-if" if="[[votes]]">
-        ([[votes]])
+        <span class="text">([[votes]])</span>
       </template>
+
       <!-- The slot to show extra text-->
       <template is="dom-if" if="[[readOnly]]">
-        <slot name="votes"></slot>
+        <slot class="text" name="votes"></slot>
       </template>
     </div>
   </template>
 
   <script>
     Polymer({
-
       is: "hot-star-rating",
 
       observers: [
-          '_updateStars(value,maxStars)'
+        '_updateStars(value,maxStars)'
       ],
 
       behaviors: [
@@ -108,12 +127,11 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
       ],
 
       properties: {
-
         _stars: {
           type: Array,
-          value: function(){
+          value: function() {
             return [];
-          },
+          }
         },
 
         value: {
@@ -140,31 +158,29 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
         maxStars: {
           type: Number,
           value: 5
-        },
-
+        }
       },
 
-      attached: function(){
+      attached: function() {
         var a = [];
-        for( var i = 0; i < this.maxStars; i++ ) a.push( { value: "star-border" } );
+        for (var i = 0; i < this.maxStars; i++) a.push({ value: "star-border" });
         this._stars = a;
-        this._updateStars( this.value, this.maxStars );
+        this._updateStars(this.value, this.maxStars);
       },
 
-      _updateValue: function( e ) {
-        var id = parseInt( e.currentTarget.id );
+      _updateValue: function(e) {
+        var id = parseInt(e.currentTarget.id);
         this.value = id + 1;
       },
 
-      _updateStars: function( value, maxStars ) {
-        var intPart = Math.floor( value );
+      _updateStars: function(value, maxStars) {
+        var intPart = Math.floor(value);
         var decimalPart = value % 1;
-        for( var i = 0; i < maxStars; i++ ) {
-            this.set( '_stars.' +  i + '.value',  (i < intPart) ?  'star' : 'star-border' ) ;
+        for (var i = 0; i < maxStars; i++) {
+            this.set('_stars.' +  i + '.value',  (i < intPart) ?  'star' : 'star-border') ;
         }
-        if( decimalPart >= 0.5 ) this.set( '_stars.' +  intPart + '.value', "star-half" );
-      },
-
+        if (decimalPart >= 0.5) this.set('_stars.' +  intPart + '.value', "star-half");
+      }
     });
   </script>
 </dom-module>

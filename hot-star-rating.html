@@ -103,8 +103,8 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
         </template>
       </template>
 
-      <template is="dom-if" if="[[votes]]">
-        <span class="text">([[votes]])</span>
+      <template is="dom-if" if="[[_defined(votes)]]">
+        <span class="text">([[_displayVotes(votes)]])</span>
       </template>
 
       <!-- The slot to show extra text-->
@@ -180,7 +180,16 @@ Core originally based from https://github.com/acordeonl/star-rating and https://
             this.set('_stars.' +  i + '.value',  (i < intPart) ?  'star' : 'star-border') ;
         }
         if (decimalPart >= 0.5) this.set('_stars.' +  intPart + '.value', "star-half");
-      }
+      },
+
+      _defined: function( votes ){
+        return typeof votes  != 'undefined';
+      },
+
+      _displayVotes: function( votes ){
+        return votes == 0  ? "no ratings" : votes;
+      },
+
     });
   </script>
 </dom-module>
